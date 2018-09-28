@@ -1,0 +1,19 @@
+{
+  "name": "api-chat",
+  "version": "1.0.0",
+  "description": "API for chat application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Antoan Partadzhiev",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongoose": "^5.2.18"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
+}
