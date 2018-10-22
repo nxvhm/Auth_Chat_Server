@@ -4,10 +4,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const User       = require('./models/user');
-const Controllers = require('./Controllers/Controllers');
+const {AuthController} = require('./Controllers/Controllers');
 
-console.log(process.env.MONGODB_URI);
 mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
+console.log(process.env.MONGODB_URI);
 
 var app = express();
 const port = process.env.PORT;
@@ -15,11 +15,11 @@ const port = process.env.PORT;
 app.use(bodyParser.json());
 
 
-app.post('/login', Controllers.AuthController.login, (error) => {
+app.post('/login', AuthController.login, (error) => {
     res.status(400).send(error);
 });
 
-app.post('/signup', Controllers.AuthController.signup, (error) => {
+app.post('/signup', AuthController.signup, (error) => {
     res.status(400).send(error);
 });
 
