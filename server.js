@@ -3,7 +3,6 @@ require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const User       = require('./models/user');
 const {AuthController} = require('./Controllers/Controllers');
 
 mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});

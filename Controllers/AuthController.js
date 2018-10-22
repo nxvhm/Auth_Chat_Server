@@ -5,9 +5,9 @@ module.exports = {
   // Signup Account
   signup: function(request, response) {
     
-    request.body.password = "";
+    // request.body.password = null;
     let user = new User(request.body);
-
+    console.log(request.body);
     let errors = user.validateSync();
 
     if (errors) {
@@ -21,7 +21,7 @@ module.exports = {
 
   // Login Account to Application
   login: function(request, response) {
-    let params = req.body;
+    let params = request.body;
     let user = new User(params);
     return user;
   }

@@ -15,7 +15,10 @@ var User = mongoose.model('User', {
   },
   password: {
     type: String,
-    required: true,
+    validate: {
+      validator: (v) => validator.isLength(v, {min:6,max:20}),
+      message: 'Password min/max length is 6/20'
+    }    
   },  
   username: {
     type: String,
