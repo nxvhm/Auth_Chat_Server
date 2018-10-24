@@ -30,7 +30,7 @@ module.exports = {
                 response.send(err)
             } else {
                 const token = user.generateAuthToken();
-                res.header('x-auth-token', token);
+                response.header('x-auth-token', token);
                 response.send({
                     'success': 1,
                     'msg': 'User created',

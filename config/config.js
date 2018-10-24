@@ -4,13 +4,16 @@ if (env === 'development') {
     process.env.PORT = 3900;
     process.env.MONGODB_URI = 'mongodb://localhost:27017/users';
     process.env.BCRYPT_AUTH_ROUNDS = 11;
+    process.env.JWT_PRIVATE_KEY = 'vidly_jwtPrivateKey';
   } else if (env === 'test') {
     process.env.PORT = 5555;
     process.env.MONGODB_URI = 'mongodb://localhost:27017/usersTest';
     process.env.BCRYPT_AUTH_ROUNDS = 11;
+    process.env.JWT_PRIVATE_KEY = 'vidly_jwtPrivateKey';
   } else if (env == 'prod' || env == 'production') {
     process.env.PORT = 5555;
     process.env.MONGODB_URI = 'mongodb://localhost:27017/usersTest';
     process.env.BCRYPT_AUTH_ROUNDS = 12;
+    process.env.JWT_PRIVATE_KEY = '5834utfde&%$dasdas';
   }
   
