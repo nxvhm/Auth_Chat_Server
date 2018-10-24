@@ -1,22 +1,36 @@
+require('./../config/config');
 const User = require('./../models/user');
+const bcrypt = require('bcryptjs');
 
 module.exports = {
 
   // Signup Account
-  signup: function(request, response) {
+  signup: async function(request, response, next) {
     
-    // request.body.password = null;
     let user = new User(request.body);
-    console.log(request.body);
-    let errors = user.validateSync();
 
+    // Validate input
+    let errors = user.validateSync();
     if (errors) {
       return response.send(errors);
     }
-    
-    let result = user.save();
 
-    response.send(result);
+    // Check if user email exists
+    let exists = await User.findOne({email: user.email});
+    
+    if (exists) {
+      return response.status(200).send({errors: {email: {message: 'Email already exists'}} });
+    }
+
+    user.password =  bcrypt.hashSync(request.body.password, parseInt(process.env.BCRYPT_AUTH_ROUNDS));
+
+    let result = user.save(err => {
+      if (err) { 
+        response.send(err) 
+      } else {
+        response.send({'success': 1, 'msg': 'User created'});
+      }
+    });
   },
 
   // Login Account to Application
