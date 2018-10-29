@@ -1,4 +1,12 @@
-require('./config/config');
+console.log('SERVER ENV:',process.env.NODE_ENV);
+
+if (process.env.NODE_ENV !== 'production') {
+    // Configure with .env file for every env diff. then prod.
+    require('dotenv').config();
+} else {
+    // Use config file 
+    require('./config/config');
+}
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -19,7 +27,7 @@ app.post('/login', AuthController.login, (error) => {
 });
 
 app.post('/signup', AuthController.signup, (error) => {
-    res.status(400).send(error);
+    res.status(400).send(error);    
 });
 
 app.get('/users/active', (req, res) => {
