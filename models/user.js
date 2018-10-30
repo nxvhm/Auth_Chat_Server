@@ -1,4 +1,3 @@
-require('./../config/config');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
@@ -25,7 +24,7 @@ const userSchema = mongoose.Schema({
     username: {
         type: String,
         required: true,
-        minlength: 6
+        minlength: 4
     },
     gender: {
         type: Number,
