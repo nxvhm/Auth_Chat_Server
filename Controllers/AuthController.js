@@ -1,6 +1,7 @@
 require('./../config/config');
 const User = require('./../models/user');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 
 module.exports = {
@@ -41,9 +42,35 @@ module.exports = {
     },
 
     // Login Account to Application
-    login: function (request, response) {
+    login: async function (request, response) {
         let params = request.body;
-        let user = new User(params);
-        return user;
+
+        let result = {msg: ''};
+
+        // Validate params
+        if (!params.email || !validator.isEmail(params.email)) {
+            result.error = 1;
+            result.msg = `${params.email} is not a valid email`;
+            return response.send(result);
+        }
+
+        if (!params.password || params.password.length < 6) {
+            result.error = 1;
+            result.msg = 'Password should be at least 6 characters long';
+            return response.send(result);
+        }
+
+        // Fetch user by email
+        let user = await User.findOne({email: params.email});
+
+        if (!user) {
+            result.error = 1;
+            result.msg = 'Email/Password does not match';
+            return response.send(result);
+        }
+
+        if (bcrypt.compareSync(params.password, user.password)) {
+            console.log('Successfull login attempt', user);
+        }
     }
 };
