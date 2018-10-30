@@ -1,4 +1,3 @@
-require('./../config/config');
 const User = require('./../models/user');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
@@ -21,7 +20,7 @@ module.exports = {
         let exists = await User.findOne({email: user.email});
 
         if (exists) {
-            return response.status(200).send({errors: {email: {message: 'Email already exists'}}});
+            return response.send({errors: {email: {message: 'Email already exists'}}});
         }
 
         user.password = bcrypt.hashSync(request.body.password, parseInt(process.env.BCRYPT_AUTH_ROUNDS));
@@ -30,12 +29,9 @@ module.exports = {
             if (err) {
                 response.send(err)
             } else {
-                const token = user.generateAuthToken();
-                response.header('x-auth-token', token);
                 response.send({
                     'success': 1,
                     'msg': 'User created',
-                    'token generated and set in x-auth-token header: ': token
                 });
             }
         });
@@ -68,9 +64,14 @@ module.exports = {
             result.msg = 'Email/Password does not match';
             return response.send(result);
         }
-
         if (bcrypt.compareSync(params.password, user.password)) {
-            console.log('Successfull login attempt', user);
+            const token = user.generateAuthToken();
+            response.header('x-auth-token', token);
+            response.send({token});            
+        } else {
+            result.error = 1;
+            result.msg = 'Email/Password does not match';
+            return response.send(result);
         }
     }
 };
