@@ -17,7 +17,7 @@ mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
 console.log(process.env.MONGODB_URI);
 
 var app = express();
-const port = process.env.PORT;
+const port = process.env.PORT ? Number(process.env.PORT) : 4000;
 
 app.use(bodyParser.json());
 
