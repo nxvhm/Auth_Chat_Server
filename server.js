@@ -11,8 +11,7 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const {AuthController} = require('./Controllers/Controllers');
-const fs = require('fs');
+const {AuthController, UserController} = require('./Controllers/Controllers');
 
 mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
 console.log(process.env.MONGODB_URI);
@@ -23,14 +22,19 @@ const port = process.env.PORT ? Number(process.env.PORT) : 4000;
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// Login attempts
 app.post('/login', AuthController.login, (error) => {
     res.status(400).send(error);
 });
-
+// Signup requests
 app.post('/signup', AuthController.signup, (error) => {
     res.status(400).send(error);
 });
-
+// Get list of available avatars
+app.get('/avatars', UserController.getListOfAvatars, err => {
+  res.status(400).send(err);
+});
+// temporal use for mockups
 app.get('/users/active', (req, res) => {
 
     let userList = [
@@ -60,20 +64,6 @@ app.get('/users/active', (req, res) => {
 }, err => {
     res.status(400).send(err);
 });
-
-app.get('/avatars', (req, res) => {
-  let avatarsFolder = './public/avatars';
-  let avatars = [];
-
-  fs.readdirSync(avatarsFolder).forEach(file => {
-    let avatarUrl = req.protocol + '://' + req.get('host') + req.originalUrl + file;
-    avatars.push(avatarUrl);
-  });
-
-  res.send(avatars);
-}, err => {
-  res.status(400).send(err);
-})
 
 
 app.listen(port, () => {
