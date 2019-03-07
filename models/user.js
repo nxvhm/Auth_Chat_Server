@@ -31,6 +31,10 @@ const userSchema = mongoose.Schema({
         required: true,
         default: 1
     },
+    avatar: {
+      type: String,
+      default: ""
+    },
     tokens: [{
         access: {
             type: String,
@@ -44,15 +48,14 @@ const userSchema = mongoose.Schema({
 });
 
 userSchema.methods.generateAuthToken = function () {
-  return jwt.sign({_id: this._id}, process.env.JWT_PRIVATE_KEY);
+  return jwt.sign({
+    _id: this._id,
+    username: this.username,
+    email: this.email,
+    avatar: this.avatar
+  }, process.env.JWT_PRIVATE_KEY, {expiresIn: '1h'});
 };
 
 var User = mongoose.model('User', userSchema);
 
 module.exports = User;
-
-
-// email	admin@admin.com
-// gender	2
-// password	123456
-// username	toonito
