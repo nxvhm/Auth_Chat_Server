@@ -1,4 +1,5 @@
 const {AuthController, UserController} = require('./../Controllers/Controllers');
+const {authRequired} = require('./../middleware');
 
 module.exports = app => {
   // Login attempts
@@ -16,7 +17,7 @@ module.exports = app => {
     res.status(400).send(err);
   });
 
-  app.post('/user/save-avatar', UserController.saveAvatar, err => {
+  app.post('/user/save-avatar', authRequired, UserController.saveAvatar, err => {
     res.status(400).send(err);
   });
 
