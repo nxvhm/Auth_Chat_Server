@@ -15,5 +15,9 @@ module.exports = {
     });
 
     return res.send(avatars);
+  },
+
+  saveAvatar: (req, res) => {
+    res.send(req.body);
   }
 }
