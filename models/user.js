@@ -52,10 +52,12 @@ userSchema.methods.generateAuthToken = function () {
     _id: this._id,
     username: this.username,
     email: this.email,
-    avatar: this.avatar
+    avatar: this.avatar ? this.getAvatarUrl() : ''
   }, process.env.JWT_PRIVATE_KEY, {expiresIn: '1h'});
 };
 
-var User = mongoose.model('User', userSchema);
+userSchema.methods.getAvatarUrl = function() {
+  return process.env.APP_URL + 'avatars/'+this.avatar;
+};
 
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
