@@ -1,4 +1,6 @@
 const fs = require('fs');
+const mongoose = require('mongoose');
+const User = require('../models/user');
 
 module.exports = {
   /**
@@ -17,7 +19,22 @@ module.exports = {
     return res.send(avatars);
   },
 
-  saveAvatar: (req, res) => {
-    res.send({...req.body, ...req.user});
+  saveAvatar: async (req, res) => {
+    let {userId, avatar} = req.body;
+
+    avatar = avatar.split('/');
+    avatar = avatar[avatar.length - 1];
+
+    if (req.user._id !== userId) {
+      res.send(401);
+    }
+
+    let userData = await User.findOneAndUpdate({
+      _id: new mongoose.Types.ObjectId(userId)
+    }, {avatar}, {new: true}).exec();
+
+    let updatedUser = new User(userData);
+
+    res.send({token: updatedUser.generateAuthToken()});
   }
 }
