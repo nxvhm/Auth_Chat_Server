@@ -12,6 +12,7 @@ console.log('MONGODB URI:', process.env.MONGODB_URI);
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const webSocket = require('./Socket/Server');
 
 mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
 
@@ -23,9 +24,10 @@ app.use(express.static('public'));
 
 require('./Routes/users')(app);
 
+let servers = webSocket.configServer(app);
 
-app.listen(port, () => {
-    console.log(`LISTENING ON PORT: ${port}`);
-});
+servers.http.listen(port, () => {
+  console.log(`HTTP/WS SERVERS LISTENING ON PORT ${port}`);
+})
 
 module.exports = {app};
