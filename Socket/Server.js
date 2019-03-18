@@ -1,22 +1,7 @@
 // const http = require('http').Server;
 const WebSocketServer = require('ws').Server;
 
-let ChattyWebSocketServer = {
-
-  /**
-   * @var {object} app Express Application Instance
-   */
-  app: null,
-
-  /**
-   * @var {object} http Node built-in http server
-   */
-  http: null,
-
-  /**
-   * @var {object} wss WEB Socket Server from ws package
-   */
-  wss: null,
+class ChattyWebSocketServer {
 
   /**
    * Provide The express application which will be used to handle http traffic
@@ -24,27 +9,37 @@ let ChattyWebSocketServer = {
    * @param   {Object}  app  Express Application
    * @return  {Object} Instance of this object with provided app, http and wss fields
    */
-  configServer: (app) => {
+  constructor(app) {
 
-    this.http = require('http').createServer();
+    /**
+     * @var {object} app Express Application Instance
+     */
     this.app = app;
 
-    // Init WebSocket Over our Http Server
+    /**
+     * @var {object} http Node built-in http server
+     */
+    this.http = require('http').createServer();
+
+    /**
+     * Init WebSocket Over our Http Server
+     * @var {object} wss WEB Socket Server from ws package
+     */
     this.wss = new WebSocketServer({
       server: this.http,
     });
 
     // Pass all http requests to our express setup
     this.http.on('request', app);
+
     // Handle New Connection
-    this.wss.on('connection', ChattyWebSocketServer.newClient);
+    this.wss.on('connection', this.newClient);
+
     console.log('WEBSOCKET STARTED');
 
-    return this;
+  }
 
-  },
-
-  newClient: (ws, req) => {
+  newClient(ws, req) {
     let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     console.log('NEW CLIENT', ip);
     ws.on('message', function incoming(message) {
@@ -53,7 +48,7 @@ let ChattyWebSocketServer = {
 
       ws.send(JSON.stringify({msg: 1111}));
     });
-  },
+  }
 
 
 };
