@@ -1,5 +1,6 @@
 // const http = require('http').Server;
 const WebSocketServer = require('ws').Server;
+const url = require('url');
 
 class ChattyWebSocketServer {
 
@@ -41,12 +42,20 @@ class ChattyWebSocketServer {
 
   newClient(ws, req) {
     let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log('NEW CLIENT', ip);
+    let request = url.parse(req.url, true);
+
+    ws.uid = request.query.uid;
+    console.log('NEW CLIENT', ip, request.query.uid);
+
     ws.on('message', function incoming(message) {
 
       console.log(`received: ${message}`);
 
       ws.send(JSON.stringify({msg: 1111}));
+    });
+
+    ws.on('close', function close() {
+      console.log('DISCONNECTED', ws.uid);
     });
   }
 
