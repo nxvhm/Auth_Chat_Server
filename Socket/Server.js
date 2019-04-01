@@ -2,61 +2,66 @@
 const WebSocketServer = require('ws').Server;
 const url = require('url');
 
-class ChattyWebSocketServer {
+const ChattyWSS = {
 
   /**
-   * Provide The express application which will be used to handle http traffic
-   *
-   * @param   {Object}  app  Express Application
-   * @return  {Object} Instance of this object with provided app, http and wss fields
+   * @var {object} http Node built-in http server
    */
-  constructor(app) {
+  http: null,
 
-    /**
-     * @var {object} app Express Application Instance
-     */
-    this.app = app;
+  /**
+   * Init WebSocket Over our Http Server
+   * @var {object} wss WEB Socket Server from ws package
+   */
+  wss: null,
 
-    /**
-     * @var {object} http Node built-in http server
-     */
-    this.http = require('http').createServer();
+  start: (http) => {
 
-    /**
-     * Init WebSocket Over our Http Server
-     * @var {object} wss WEB Socket Server from ws package
-     */
+    this.http = http;
+
     this.wss = new WebSocketServer({
-      server: this.http,
+      server: http,
     });
-
-    // Pass all http requests to our express setup
-    this.http.on('request', app);
-
     // Handle New Connection
-    this.wss.on('connection', this.newClient);
+    this.wss.on('connection', ChattyWSS.newClient);
+  },
 
-    console.log('WEBSOCKET STARTED');
-
-  }
-
-  newClient(ws, req) {
+  newClient: (ws, req) => {
+    // Get user ip
     let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    // Parse GET params
     let request = url.parse(req.url, true);
-
+    // Assign user id to the client connection object
     ws.uid = request.query.uid;
     console.log('NEW CLIENT', ip, request.query.uid);
-
-    ws.on('message', function incoming(message) {
-
-      console.log(`received: ${message}`);
-
-      ws.send(JSON.stringify({msg: 1111}));
-    });
-
-    ws.on('close', function close() {
+    // On New Message Handler
+    ws.on('message', ChattyWSS.incomingMessage);
+    // Close connection
+    ws.on('close', function closeConnection() {
       console.log('DISCONNECTED', ws.uid);
     });
+
+  },
+
+  incomingMessage: (msg) => {
+    console.log(`received: ${msg}`);
+  },
+
+
+
+  /**
+   * Get list of currently connected user id
+   * @return  {Array} array with user ids
+   */
+  getConnectedUserIds(e) {
+    console.log('SERVER:getConnectedUserIds', e);
+    let users = [];
+
+    this.wss.clients.forEach(client => {
+      users.push(client.uid);
+    });
+
+    return users;
   }
 
 
@@ -66,4 +71,4 @@ class ChattyWebSocketServer {
 /**
  * Pass the Express App to mount the http server on
  */
-module.exports = ChattyWebSocketServer;
+module.exports = ChattyWSS;

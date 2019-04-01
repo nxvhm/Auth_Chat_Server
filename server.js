@@ -12,11 +12,11 @@ console.log('MONGODB URI:', process.env.MONGODB_URI);
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const ChattyWebSocketServer = require('./Socket/Server');
+const ChattyWSS = require('./Socket/Server');
 
 mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
 
-var app = express();
+const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 4000;
 
 app.use(bodyParser.json());
@@ -24,9 +24,13 @@ app.use(express.static('public'));
 
 require('./Routes/users')(app);
 
-let servers = new ChattyWebSocketServer(app);
+const http = require('http').createServer();
+// Pass all http requests to our express setup
+http.on('request', app);
 
-servers.http.listen(port, () => {
+ChattyWSS.start(http);
+
+http.listen(port, () => {
   console.log(`HTTP/WS SERVERS LISTENING ON PORT ${port}`);
 })
 
