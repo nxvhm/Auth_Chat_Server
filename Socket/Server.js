@@ -1,8 +1,8 @@
 // const http = require('http').Server;
-const WebSocketServer = require('ws').Server;
+const WebSocket = require('ws');
+const WebSocketServer = WebSocket.Server;
 const url = require('url');
-
-const ChattyWSS = {
+var ChattyWSS = {
 
   /**
    * @var {object} http Node built-in http server
@@ -17,13 +17,13 @@ const ChattyWSS = {
 
   start: (http) => {
 
-    this.http = http;
+    ChattyWSS.http = http;
 
-    this.wss = new WebSocketServer({
+    ChattyWSS.wss = new WebSocketServer({
       server: http,
     });
     // Handle New Connection
-    this.wss.on('connection', ChattyWSS.newClient);
+    ChattyWSS.wss.on('connection', ChattyWSS.newClient);
   },
 
   newClient: (ws, req) => {
@@ -54,7 +54,6 @@ const ChattyWSS = {
    * @return  {Array} array with user ids
    */
   getConnectedUserIds(e) {
-    console.log('SERVER:getConnectedUserIds', e);
     let users = [];
 
     this.wss.clients.forEach(client => {
@@ -62,8 +61,21 @@ const ChattyWSS = {
     });
 
     return users;
-  }
+  },
 
+  broadcast: (data, uid = null) => {
+    ChattyWSS.wss.clients.forEach(function each(client) {
+
+      if (uid !== null && client.uid == uid) {
+        continue;
+      }
+
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+
+    });
+  }
 
 };
 
