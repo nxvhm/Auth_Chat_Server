@@ -57,7 +57,9 @@ module.exports = {
         }
 
         // Fetch user by email
-        let user = await User.findOne({email: params.email});
+        let user = await User.findOne({email: params.email})
+          .select('+password')
+          .exec();
 
         if (!user) {
             result.error = 1;
@@ -67,7 +69,7 @@ module.exports = {
         if (bcrypt.compareSync(params.password, user.password)) {
             const token = user.generateAuthToken();
             response.header('x-auth-token', token);
-            response.send({token});            
+            response.send({token});
         } else {
             result.error = 1;
             result.msg = 'Email/Password does not match';

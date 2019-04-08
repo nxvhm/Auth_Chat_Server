@@ -16,6 +16,7 @@ const userSchema = mongoose.Schema({
     },
     password: {
         type: String,
+        select: false,
         validate: {
             validator: (v) => validator.isLength(v, {min: 6, max: 64}),
             message: 'Password min/max length is 8/64'
