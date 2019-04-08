@@ -39,7 +39,18 @@ var ChattyWSS = {
     // Close connection
     ws.on('close', function closeConnection() {
       console.log('DISCONNECTED', ws.uid);
+      // Broadcast new user event to clients to refresh list
+      ChattyWSS.broadcast({
+        type: 'event',
+        name: 'new-user-online'
+      }, ws.uid);
     });
+
+    // Broadcast new user event to clients
+    ChattyWSS.broadcast({
+      type: 'event',
+      name: 'new-user-online'
+    }, ws.uid);
 
   },
 
@@ -62,16 +73,21 @@ var ChattyWSS = {
 
     return users;
   },
-
+  /**
+   * Broadcast data to all connection clients
+   * @param   {object} data Object containing data to send to client. This will be serialized to json
+   * @param   {string} uid  The client to skipp
+   * @return  {void}
+   */
   broadcast: (data, uid = null) => {
     ChattyWSS.wss.clients.forEach(function each(client) {
 
       if (uid !== null && client.uid == uid) {
-        continue;
+        return;
       }
 
       if (client.readyState === WebSocket.OPEN) {
-        client.send(data);
+        client.send(JSON.stringify(data));
       }
 
     });
