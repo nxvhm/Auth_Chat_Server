@@ -1,6 +1,5 @@
 const {AuthController, UserController} = require('./../Controllers/Controllers');
 const {authRequired} = require('./../middleware');
-const ChattyWSS = require('../Socket/Server');
 
 module.exports = app => {
   // Login attempts
@@ -22,12 +21,9 @@ module.exports = app => {
     res.status(400).send(err);
   });
 
-  app.get('/users/online', (req, res) => {
-    if (ChattyWSS.wss !== null) {
-      res.send(ChattyWSS.getConnectedUserIds());
-    } else {
-      res.send(JSON.stringify({'msg':'NO WebSocketServer runing', error: 1}))
-    }
+
+  app.get('/users/online', UserController.getUsersOnline, err => {
+    res.status(400).send(err);
   });
 
   // temporal use for mockups

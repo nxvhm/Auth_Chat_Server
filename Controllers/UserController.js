@@ -1,6 +1,7 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
 const User = require('../models/user');
+const ChatWSS = require('../Socket/Server');
 
 module.exports = {
   /**
@@ -26,7 +27,7 @@ module.exports = {
     avatar = avatar[avatar.length - 1];
 
     if (req.user._id !== userId) {
-      res.send(401);
+      return res.send(401);
     }
 
     let userData = await User.findOneAndUpdate({
@@ -35,6 +36,37 @@ module.exports = {
 
     let updatedUser = new User(userData);
 
-    res.send({token: updatedUser.generateAuthToken()});
+    return res.send({token: updatedUser.generateAuthToken()});
+  },
+
+  getUsersOnline: async (req, res) => {
+    if (ChatWSS.wss !== null) {
+
+      let userIds = ChatWSS.getConnectedUserIds();
+
+      if (!userIds) {
+        return res.send({});
+      }
+
+      let users = await User.find({'_id': {'$in': userIds}}, {tokens: 0}).exec();
+
+      let result = [];
+
+      users.forEach( (user, index) => {
+
+        result.push({
+          username: user.username,
+          avatar: user.getAvatarUrl(),
+          email: user.email,
+          _id: user._id
+        });
+
+      });
+
+      return res.send(result);
+
+    } else {
+      return res.send(JSON.stringify({'msg':'NO WebSocketServer runing', error: 1}))
+    }
   }
 }
