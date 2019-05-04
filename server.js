@@ -19,6 +19,16 @@ mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
 const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 4000;
 
+if (process.env.ALLOW_CORS) {
+  console.log('CORS ALLOWED');
+
+  let allowedOrigin = process.env.ALLOW_CORS_ORIGIN
+    ? {origin: process.env.ALLOW_CORS_ORIGIN}
+    : null;
+
+  app.use(require('cors')(allowedOrigin));
+}
+
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
