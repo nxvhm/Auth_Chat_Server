@@ -2,7 +2,7 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const User = require('../models/user');
 const ChatWSS = require('../Socket/Server');
-
+const MongoId = mongoose.Types.ObjectId;
 module.exports = {
   /**
    * Get list of available avatars in the system
@@ -38,7 +38,9 @@ module.exports = {
 
     return res.send({token: updatedUser.generateAuthToken()});
   },
-
+  /**
+   * Get users currently connected to the WebSocker server
+   */
   getUsersOnline: async (req, res) => {
     if (ChatWSS.wss !== null) {
 
@@ -68,5 +70,19 @@ module.exports = {
     } else {
       return res.send(JSON.stringify({'msg':'NO WebSocketServer runing', error: 1}))
     }
+  },
+
+  getUserData: async (req, res) => {
+    let {userId} = req.params;
+
+    if(!userId || !MongoId.isValid(userId)) {
+      res.send(404);
+    }
+
+    let user = await User.findById(userId);
+    let userData = user.toObject();
+    userData.avatarUrl = user.getAvatarUrl();
+
+    res.send(userData);
   }
 }

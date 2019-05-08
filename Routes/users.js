@@ -21,8 +21,11 @@ module.exports = app => {
     res.status(400).send(err);
   });
 
+  app.get('/user/:userId', authRequired, UserController.getUserData, err => {
+    res.status(400).send(err);
+  });
 
-  app.get('/users/online', UserController.getUsersOnline, err => {
+  app.get('/users/online', authRequired, UserController.getUsersOnline, err => {
     res.status(400).send(err);
   });
 
