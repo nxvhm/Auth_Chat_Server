@@ -16,7 +16,7 @@ WebSocket Lib: [WS](https://www.npmjs.com/package/ws)
 cd auth-chat-server       
 npm install
 ```                                 
-3. Copy .env.example to create .env file
+3. ***Copy .env.example to create .env file***
 ```bash
 cp .evn.example .evn
 ```

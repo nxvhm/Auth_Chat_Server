@@ -32,7 +32,7 @@ if (process.env.ALLOW_CORS) {
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-require('./Routes/users')(app);
+require('./Routes')(app);
 
 const http = require('http').createServer();
 // Pass all http requests to our express setup
