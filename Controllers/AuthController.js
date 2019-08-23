@@ -1,6 +1,7 @@
 const User = require('./../models/user');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
 
 
 module.exports = {
@@ -75,5 +76,22 @@ module.exports = {
             result.msg = 'Email/Password does not match';
             return response.send(result);
         }
+    },
+
+    verify: function(request, response) {
+      let token = request.query.token ? request.query.token : false;
+      if (!token) {
+        return response.send({'success': false});
+      }
+
+      jwt.verify(token, process.env.JWT_PRIVATE_KEY, (err, decoded) => {
+
+        if (err){
+          console.log(err);
+          return response.send({'success': false});
+
+        }
+        return response.send({'success': true});
+      });
     }
 };

@@ -12,6 +12,10 @@ module.exports = app => {
     res.status(400).send(error);
   });
 
+  app.get('/verify-token', AuthController.verify, (error) => {
+    res.status(400).send(error);
+  });
+
   // Get list of available avatars
   app.get('/avatars', UserController.getListOfAvatars, err => {
     res.status(400).send(err);
