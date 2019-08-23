@@ -1,4 +1,4 @@
-const {AuthController, UserController} = require('./../Controllers/Controllers');
+const {AuthController, UserController} = require('./../Controllers');
 const {authRequired} = require('./../middleware');
 
 module.exports = app => {
