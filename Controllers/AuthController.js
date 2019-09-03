@@ -1,6 +1,7 @@
 const User = require('./../models/user');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
+const Auth = require(global.rootPath+'/Lib/Auth');
 const jwt = require('jsonwebtoken');
 
 
@@ -80,18 +81,15 @@ module.exports = {
 
     verify: function(request, response) {
       let token = request.query.token ? request.query.token : false;
+      let userData = request.query.userData ? true: false;
+
       if (!token) {
         return response.send({'success': false});
       }
-
-      jwt.verify(token, process.env.JWT_PRIVATE_KEY, (err, decoded) => {
-
-        if (err){
-          console.log(err);
-          return response.send({'success': false});
-
-        }
-        return response.send({'success': true});
+      Auth.verifyToken(token, userData).then(data => {
+        return response.send(data);
+      }).catch(err => {
+        return response.send({success:false});
       });
     }
 };

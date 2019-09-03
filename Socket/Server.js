@@ -2,6 +2,7 @@
 const WebSocket = require('ws');
 const WebSocketServer = WebSocket.Server;
 const url = require('url');
+const ClientsMap = require('./ClientsMap');
 var ChattyWSS = {
 
   /**
@@ -15,6 +16,8 @@ var ChattyWSS = {
    */
   wss: null,
 
+  clientMap: new ClientsMap(),
+
   start: (http) => {
 
     ChattyWSS.http = http;
@@ -27,24 +30,33 @@ var ChattyWSS = {
   },
 
   newClient: (ws, req) => {
-    // Get user ip
-    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
     // Parse GET params
     let request = url.parse(req.url, true);
+
     // Assign user id to the client connection object
-    ws.uid = request.query.uid;
-    console.log('NEW CLIENT', ip, request.query.uid);
+    ws.uid        = request.query.uid;
+    ws.userAgent  = req.headers['user-agent'];
+    ws.ip         = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
     // On New Message Handler
     ws.on('message', ChattyWSS.incomingMessage);
-    // Close connection
-    ws.on('close', function closeConnection() {
-      console.log('DISCONNECTED', ws.uid);
+
+    // On Close connection
+    ws.on('close', function(){
+
+      // Remove connection from clients map
+      ChattyWSS.clientMap.disconnect(ws);
       // Broadcast new user event to clients to refresh list
       ChattyWSS.broadcast({
         type: 'event',
         name: 'new-user-online'
       }, ws.uid);
+
+      console.log('DISCONNECTED', ws.uid);
     });
+
+    ChattyWSS.clientMap.setClientConnection(ws.uid, ws);
 
     // Broadcast new user event to clients
     ChattyWSS.broadcast({
@@ -52,26 +64,31 @@ var ChattyWSS = {
       name: 'new-user-online'
     }, ws.uid);
 
+
+    console.log('NEW CLIENT', ws.ip, ws.uid);
   },
 
-  incomingMessage: (msg) => {
-    console.log(`received: ${msg}`);
+  incomingMessage: (message) => {
+    message = JSON.parse(message);
+    console.log(`RECEIVED: ${message}`);
+    console.log(message.type);
+    // Send new Private Message
+    if (message.type && message.type == 'new-pm') {
+      ChattyWSS.sendMsgToReceiver({
+        type: 'event',
+        name: 'new-pm',
+        body: message.body,
+      }, message.receiver_id);
+    }
   },
-
-
 
   /**
    * Get list of currently connected user id
    * @return  {Array} array with user ids
    */
   getConnectedUserIds(e) {
-    let users = [];
 
-    this.wss.clients.forEach(client => {
-      users.push(client.uid);
-    });
-
-    return users;
+    return Object.keys(this.clientMap.clients);
   },
   /**
    * Broadcast data to all connection clients
@@ -90,6 +107,24 @@ var ChattyWSS = {
         client.send(JSON.stringify(data));
       }
 
+    });
+  },
+
+  sendMsgToReceiver(msg, uid) {
+    if (!msg || !uid) {
+      return false;
+    }
+
+    console.log(uid, msg);
+    let connections = this.clientMap.getClientConnection(uid);
+    console.log(ChattyWSS.clientMap);
+
+    if (connections === undefined || !connections.length) {
+      return false;
+    }
+    connections.forEach((connection, index) => {
+      connection.send(JSON.stringify(msg));
+      return "msg send";
     });
   }
 

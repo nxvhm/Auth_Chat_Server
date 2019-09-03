@@ -1,8 +1,8 @@
 const { body, check, validationResult  } = require('express-validator');
-const ChatHandler = require('./../../Lib/Chats/Handler');
-
+const ChatHandler = require(global.rootPath+'/Lib/Chats/Handler');
+const Conversation = require(global.rootPath+'/Models/Schemas/conversation');
 var mongoose = require('mongoose');
-
+const ChatServer = require(global.rootPath+'/Socket/server');
 module.exports = {
 
   sendMessageValidation: () => {
@@ -24,9 +24,13 @@ module.exports = {
       return res.status(422).json({ errors: errors.array() });
     }
 
-    let data = req.body;
-    console.log(ChatHandler.getChatPairId(data.sender_id, data.receiver_id));
+    // Validate Contents,
+    // Save Message To DB,
+    // etc
+
     console.log(req.body);
+
+    res.send({success:true});
   },
 
 }
