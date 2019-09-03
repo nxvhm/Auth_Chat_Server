@@ -1,5 +1,5 @@
 const {AuthController, UserController} = require('./../Controllers');
-const {authRequired} = require('./../middleware');
+const Auth = require(global.rootPath+'/Lib/Auth');
 
 module.exports = app => {
   // Login attempts
@@ -21,15 +21,15 @@ module.exports = app => {
     res.status(400).send(err);
   });
 
-  app.post('/user/save-avatar', authRequired, UserController.saveAvatar, err => {
+  app.post('/user/save-avatar', Auth.authRequiredMiddleware, UserController.saveAvatar, err => {
     res.status(400).send(err);
   });
 
-  app.get('/user/:userId', authRequired, UserController.getUserData, err => {
+  app.get('/user/:userId', Auth.authRequiredMiddleware, UserController.getUserData, err => {
     res.status(400).send(err);
   });
 
-  app.get('/users/online', authRequired, UserController.getUsersOnline, err => {
+  app.get('/users/online', Auth.authRequiredMiddleware, UserController.getUsersOnline, err => {
     res.status(400).send(err);
   });
 

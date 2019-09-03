@@ -1,11 +1,13 @@
 const {ChatController} = require('./../Controllers');
+const Auth = require(global.rootPath+'/Lib/Auth');
 
 module.exports = (app) => {
+
 // Send chat message
 app.post('/message/send',
-  ChatController.sendMessageValidation(),
+  [Auth.authRequiredMiddleware].concat(ChatController.sendMessageValidation()),
   ChatController.sendMessage,
-  (error) => {
-    res.status(400).send(error);
-  });
+  (error) => { res.status(400).send(error) }
+);
+
 }
