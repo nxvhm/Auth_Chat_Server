@@ -8,11 +8,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 console.log('SERVER ENV:',process.env.NODE_ENV);
 console.log('MONGODB URI:', process.env.MONGODB_URI);
+global.rootPath = process.cwd();
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const ChattyWSS = require('./Socket/Server');
+const auth = require('./Lib/Auth');
 
 mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
 
@@ -28,9 +30,9 @@ if (process.env.ALLOW_CORS) {
 
   app.use(require('cors')(allowedOrigin));
 }
-
 app.use(bodyParser.json());
 app.use(express.static('public'));
+app.use(auth.getUserMiddleware);
 
 require('./Routes')(app);
 
