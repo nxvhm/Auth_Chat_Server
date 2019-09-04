@@ -1,8 +1,8 @@
 const { body, check, validationResult  } = require('express-validator');
-const ChatHandler = require(global.rootPath+'/Lib/Chats/Handler');
-const Conversation = require(global.rootPath+'/Models/Schemas/conversation');
+const Message = require(global.rootPath+'/Models/Message');
+const Conversation = require(global.rootPath+'/Models/Conversation');
 var mongoose = require('mongoose');
-const ChatServer = require(global.rootPath+'/Socket/server');
+
 module.exports = {
 
   sendMessageValidation: () => {
@@ -19,18 +19,48 @@ module.exports = {
 
   sendMessage: (req, res) => {
     const errors = validationResult(req);
-
+    let responseBody = {success: true, error: false};
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
+
+    let chatData = {
+      members: [
+        mongoose.Types.ObjectId(req.body.sender_id),
+        mongoose.Types.ObjectId(req.body.receiver_id)
+      ],
+      name: "",
+      conversation_type: 'private'
+    };
+    let msgData = req.body;
+
+    Conversation.find()
+      .where('conversation_type').equals(chatData.conversation_type)
+      .where('members').in(chatData.members)
+      .then((err, chat) => {
+        if (!err) { return new Promise.reject(error)}
+
+        return !chat
+          ? Conversation.createNew(chatData)
+          : new Promise.resolve(chat);
+
+      }).then(chat => {
+        return Message.createNew(msgData, chat._id);
+      }).then(message => {
+        responseBody.message = message;
+        res.send(responseBody);
+      }).catch(error => {
+        responseBody.error = 1;
+        responseBody.success = false;
+        responseBody.message = error.message;
+        console.log("ERROR IN SEND MESSAGE ACTION", error);
+        res.send(responseBody);
+      });
 
     // Validate Contents,
     // Save Message To DB,
     // etc
 
-    console.log(req.body);
-
-    res.send({success:true});
   },
 
 }
