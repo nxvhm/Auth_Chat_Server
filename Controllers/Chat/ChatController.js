@@ -38,7 +38,7 @@ module.exports = {
       .where('conversation_type').equals(chatData.conversation_type)
       .where('members').in(chatData.members)
       .then((err, chat) => {
-        if (!err) { return new Promise.reject(error)}
+        if (err) { return new Promise.reject(error)}
 
         return !chat
           ? Conversation.createNew(chatData)
