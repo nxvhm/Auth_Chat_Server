@@ -70,15 +70,9 @@ var ChattyWSS = {
 
   incomingMessage: (message) => {
     message = JSON.parse(message);
-    console.log(`RECEIVED: ${message}`);
-    console.log(message.type);
     // Send new Private Message
-    if (message.type && message.type == 'new-pm') {
-      ChattyWSS.sendMsgToReceiver({
-        type: 'event',
-        name: 'new-pm',
-        body: message.body,
-      }, message.receiver_id);
+    if (message.type && message.name == 'new-pm' && message.receiver_id) {
+      ChattyWSS.sendMsgToReceiver(message, message.receiver_id);
     }
   },
 
@@ -117,7 +111,6 @@ var ChattyWSS = {
 
     console.log(uid, msg);
     let connections = this.clientMap.getClientConnection(uid);
-    console.log(ChattyWSS.clientMap);
 
     if (connections === undefined || !connections.length) {
       return false;
