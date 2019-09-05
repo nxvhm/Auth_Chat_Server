@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 
 module.exports = {
 
-  sendMessageValidation: () => {
+  requestValidation: () => {
     return [
       body('sender_id').not().isEmpty().custom(val => {
         return mongoose.Types.ObjectId.isValid(val);
@@ -19,7 +19,9 @@ module.exports = {
 
   sendMessage: (req, res) => {
     const errors = validationResult(req);
+
     let responseBody = {success: true, error: false};
+
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
@@ -32,17 +34,17 @@ module.exports = {
       name: "",
       conversation_type: 'private'
     };
+
     let msgData = req.body;
 
-    Conversation.find()
+    Conversation.findOne()
       .where('conversation_type').equals(chatData.conversation_type)
       .where('members').in(chatData.members)
-      .then((err, chat) => {
-        if (err) { return new Promise.reject(error)}
+      .then((chat) => {
 
         return !chat
           ? Conversation.createNew(chatData)
-          : new Promise.resolve(chat);
+          : Promise.resolve(chat);
 
       }).then(chat => {
         return Message.createNew(msgData, chat._id);
@@ -56,11 +58,6 @@ module.exports = {
         console.log("ERROR IN SEND MESSAGE ACTION", error);
         res.send(responseBody);
       });
-
-    // Validate Contents,
-    // Save Message To DB,
-    // etc
-
   },
 
 }
