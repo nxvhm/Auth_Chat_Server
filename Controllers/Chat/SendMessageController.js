@@ -36,10 +36,9 @@ module.exports = {
     };
 
     let msgData = req.body;
-
     Conversation.findOne()
       .where('conversation_type').equals(chatData.conversation_type)
-      .where('members').in(chatData.members)
+      .where('members').all(chatData.members)
       .then((chat) => {
 
         return !chat
