@@ -31,7 +31,6 @@ module.exports = {
         mongoose.Types.ObjectId(req.body.sender_id),
         mongoose.Types.ObjectId(req.body.receiver_id)
       ],
-      name: "",
       conversation_type: 'private'
     };
 
