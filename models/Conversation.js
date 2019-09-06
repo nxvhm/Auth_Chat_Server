@@ -14,4 +14,18 @@ model.createNew = (data) => {
   });
 };
 
+model.findChat = (data) => {
+
+  model.findOne()
+    .where('conversation_type').equals(data.conversation_type)
+    .where('members').all(data.members)
+    .then(conversation => {
+      return !conversation
+        ? model.createNew(data)
+        : Promise.resolve(chat);
+    }).catch(err => {
+      return Promise.reject(err);
+    });
+}
+
 module.exports = model;

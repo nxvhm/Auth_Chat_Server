@@ -5,9 +5,10 @@ module.exports = mongoose.Schema({
     type: String,
     required: true,
   },
-  conversationId: {
+  conversation_id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: 'Conversation'
   },
   receiver_id: {
     type: mongoose.Schema.Types.ObjectId,
