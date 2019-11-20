@@ -1,4 +1,4 @@
-const {SendMessageController, GetMessagesController} = require(global.rootPath+'/Controllers');
+const {SendMessageController, GetMessagesController, ChatRoomsController} = require(global.rootPath+'/Controllers');
 const Auth = require(global.rootPath+'/Lib/Auth');
 
 module.exports = (app) => {
@@ -14,6 +14,10 @@ app.get('/messages/private',
   [Auth.authRequiredMiddleware].concat(GetMessagesController.getPrivateMessagesValidation()),
   GetMessagesController.getPrivateMessages,
   (error) => { res.sendStatus(400).send(error) }
+);
+
+app.get('/chatrooms', Auth.authRequiredMiddleware, ChatRoomsController.getRooms,
+  (error) => {res.sendStatus(400).send(error) }
 );
 
 }
