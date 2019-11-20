@@ -10,6 +10,15 @@ const conversation = mongoose.Schema({
     required: false,
     default: ""
   },
+  description: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  author: {
+    type:  mongoose.Schema.Types.ObjectId, ref: 'User',
+    required: false,
+  },
   conversation_type: {
     type: String,
     required: true,
