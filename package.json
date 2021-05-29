@@ -20,7 +20,7 @@
     "lodash": "^4.17.15",
     "mongoose": "^5.7.5",
     "validator": "^10.8.0",
-    "ws": "^6.2.0"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"
